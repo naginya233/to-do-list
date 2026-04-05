@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Web Toolbox</title>
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Marked.js for Markdown Parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="app-container">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <div class="sidebar-header">
+                <h2>Toolbox</h2>
+                <button id="theme-toggle" aria-label="Toggle Dark Mode">
+                    <i class="fas fa-moon"></i>
+                </button>
+            </div>
+
+            <!-- Dynamically populated by toolbox-core.js -->
+            <ul class="nav-links" id="sidebar-nav"></ul>
+        </nav>
+
+        <!-- Main Content Area -->
+        <!-- Dynamically populated by toolbox-core.js -->
+        <main class="main-content" id="main-content"></main>
+    </div>
+
+    <!-- Floating AI Copilot Widget -->
+    <button id="ai-copilot-btn" class="ai-copilot-btn" aria-label="Open AI Copilot">
+        <i class="fas fa-sparkles"></i>
+    </button>
+
+    <div id="ai-copilot-window" class="ai-copilot-window hidden">
+        <div class="ai-header">
+            <h3><i class="fas fa-robot"></i> AI Copilot</h3>
+            <div class="ai-header-controls">
+                <select id="ai-provider-select" class="ai-provider-select">
+                    <option value="zhipu">Zhipu GLM-4 (Base)</option>
+                    <option value="nvidia_llama_70b">NVIDIA Llama 3.1 70B</option>
+                    <option value="nvidia_llama_8b">NVIDIA Llama 3.1 8B</option>
+                    <option value="nvidia_nemotron">NVIDIA Nemotron 340B</option>
+                    <option value="nvidia_mixtral">NVIDIA Mixtral 8x22B</option>
+                    <option value="nvidia_glm">NVIDIA Z.ai GLM-4</option>
+                    <option value="nvidia_minimax">NVIDIA MiniMax</option>
+                </select>
+                <button id="ai-close-btn" class="ai-close-btn"><i class="fas fa-times"></i></button>
+            </div>
+        </div>
+        <div id="ai-chat-history" class="ai-chat-history">
+            <div class="message assistant-msg">
+                <div class="msg-avatar"><i class="fas fa-robot"></i></div>
+                <div class="msg-bubble">Hello! I am your AI Copilot. Try asking me to switch to the Pomodoro timer, add
+                    a To-Do task, or toggle Dark Mode!</div>
+            </div>
+        </div>
+        <div class="ai-input-area">
+            <textarea id="ai-input" placeholder="Type your command here..." spellcheck="false"></textarea>
+            <button id="ai-send-btn" class="ai-send-btn"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Load the Engine -->
+    <script src="toolbox-config.js"></script>
+    <script src="toolbox-core.js"></script>
+    <!-- Load Copilot -->
+    <script src="tools/ai.js"></script>
+</body>
+
+</html>
