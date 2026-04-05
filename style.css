@@ -1153,6 +1153,129 @@ body {
     letter-spacing: 0.02em;
 }
 
+.for-her-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(6, 10, 18, 0.5);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    z-index: 1100;
+    animation: overlayFadeIn 0.25s ease;
+}
+
+.for-her-overlay.leaving {
+    animation: overlayFadeOut 0.25s ease forwards;
+}
+
+.for-her-card {
+    width: min(560px, 100%);
+    border-radius: 20px;
+    border: 1px solid rgba(172, 198, 239, 0.3);
+    background: linear-gradient(160deg, rgba(18, 28, 52, 0.88), rgba(25, 44, 52, 0.8));
+    box-shadow: 0 22px 50px -22px rgba(0, 0, 0, 0.75);
+    padding: 26px 26px 22px;
+    color: #e7f2ff;
+    animation: cardLiftIn 0.3s ease;
+}
+
+[data-theme="dark"] .for-her-card {
+    background: linear-gradient(160deg, rgba(18, 40, 35, 0.92), rgba(30, 56, 44, 0.84));
+    border-color: rgba(149, 217, 199, 0.3);
+}
+
+.for-her-kicker {
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    font-size: 0.72rem;
+    color: rgba(204, 226, 255, 0.82);
+    margin-bottom: 10px;
+}
+
+.for-her-card h2 {
+    font-size: 1.7rem;
+    line-height: 1.35;
+    margin-bottom: 14px;
+}
+
+.for-her-card p {
+    color: rgba(223, 237, 255, 0.9);
+    line-height: 1.7;
+    margin-bottom: 10px;
+}
+
+.for-her-actions {
+    margin-top: 18px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.for-her-btn {
+    border: none;
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.for-her-btn.secondary {
+    background: rgba(205, 220, 244, 0.2);
+    color: #e9f3ff;
+}
+
+.for-her-btn.secondary:hover {
+    background: rgba(205, 220, 244, 0.32);
+}
+
+.for-her-btn.primary {
+    background: linear-gradient(135deg, #6ea8ff, #58c7ae);
+    color: #091422;
+    font-weight: 600;
+}
+
+.for-her-btn.primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 8px 18px -8px rgba(110, 168, 255, 0.65);
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes overlayFadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+    }
+}
+
+@keyframes cardLiftIn {
+    from {
+        opacity: 0;
+        transform: translateY(16px) scale(0.98);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
 @keyframes comfortFloat {
     0% {
         transform: translateY(0) translateX(0) rotate(0deg);
@@ -1872,5 +1995,22 @@ body {
 
     .delete-btn {
         opacity: 1;
+    }
+
+    .for-her-card {
+        padding: 22px 18px 18px;
+        border-radius: 16px;
+    }
+
+    .for-her-card h2 {
+        font-size: 1.35rem;
+    }
+
+    .for-her-actions {
+        justify-content: stretch;
+    }
+
+    .for-her-btn {
+        width: 100%;
     }
 }

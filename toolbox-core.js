@@ -100,6 +100,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 5. Comfort Easter Egg for sensitive Todo inputs
     setupComfortMonitor();
+    setupForHerWelcome();
 
     function setupComfortMonitor() {
         const triggerKeywords = ['信心', '难', '失败'];
@@ -163,5 +164,52 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             return layer;
         }
+    }
+
+    function setupForHerWelcome() {
+        const seenKey = 'for-her-welcome-seen-v1';
+        if (localStorage.getItem(seenKey) === 'yes') return;
+
+        const overlay = document.createElement('div');
+        overlay.className = 'for-her-overlay';
+        overlay.innerHTML = `
+            <div class="for-her-card" role="dialog" aria-modal="true" aria-label="晚安补给站开场">
+                <p class="for-her-kicker">for her</p>
+                <h2>先别急着赢，先把自己抱稳。</h2>
+                <p>
+                    今晚的任务不是证明你有多厉害，
+                    是让心跳慢一点，让肩膀松一点。
+                </p>
+                <p>
+                    你可以先休息，也可以把选择交给我。
+                    现在，先对自己温柔一点。
+                </p>
+                <div class="for-her-actions">
+                    <button type="button" class="for-her-btn secondary" id="for-her-close-btn">我先缓一缓</button>
+                    <button type="button" class="for-her-btn primary" id="for-her-decision-btn">带我去决策辅助</button>
+                </div>
+            </div>
+        `;
+
+        document.body.appendChild(overlay);
+
+        const closeBtn = overlay.querySelector('#for-her-close-btn');
+        const decisionBtn = overlay.querySelector('#for-her-decision-btn');
+
+        const closeOverlay = () => {
+            overlay.classList.add('leaving');
+            localStorage.setItem(seenKey, 'yes');
+            setTimeout(() => overlay.remove(), 250);
+        };
+
+        closeBtn?.addEventListener('click', closeOverlay);
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) closeOverlay();
+        });
+
+        decisionBtn?.addEventListener('click', () => {
+            closeOverlay();
+            switchTool('decision');
+        });
     }
 });
