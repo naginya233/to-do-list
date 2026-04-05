@@ -9,10 +9,46 @@
 
     if (!todoForm) return;
 
-    let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+    const DEFAULT_TASKS = [
+        {
+            id: 'preset-math-rant',
+            text: '吐槽一张数学卷子 (0/1)',
+            completed: false,
+            createdAt: new Date(Date.now() - 4 * 60 * 1000).toISOString()
+        },
+        {
+            id: 'preset-milk',
+            text: '喝一杯温牛奶，奖励辛苦的脑细胞 (0/1)',
+            completed: false,
+            createdAt: new Date(Date.now() - 3 * 60 * 1000).toISOString()
+        },
+        {
+            id: 'preset-rest',
+            text: '允许自己发呆 10 分钟 (0/1)',
+            completed: false,
+            createdAt: new Date(Date.now() - 2 * 60 * 1000).toISOString()
+        },
+        {
+            id: 'preset-mock-exam',
+            text: '意识到“一模”只是模拟，不是结局 (Done)',
+            completed: true,
+            createdAt: new Date(Date.now() - 60 * 1000).toISOString()
+        }
+    ];
+
+    const storedTasks = JSON.parse(localStorage.getItem('tasks'));
+    let tasks = Array.isArray(storedTasks) && storedTasks.length > 0 ? storedTasks : DEFAULT_TASKS;
     let currentFilter = 'all';
 
+    if (!Array.isArray(storedTasks) || storedTasks.length === 0) {
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
     renderTasks();
+
+    todoInput.addEventListener('input', (e) => {
+        emitComfortSignal(e.target.value);
+    });
 
     // Filter Tasks
     filterBtns.forEach(btn => {
@@ -44,6 +80,7 @@
             };
 
             tasks.push(newTask);
+            emitComfortSignal(taskText);
             saveAndRender();
             todoInput.value = '';
 
@@ -196,6 +233,7 @@
             return task;
         });
 
+        emitComfortSignal(trimmedText);
         saveAndRender();
         if (li) li.classList.remove('editing');
     };
@@ -240,6 +278,14 @@
     function saveAndRender() {
         localStorage.setItem('tasks', JSON.stringify(tasks));
         renderTasks();
+    }
+
+    function emitComfortSignal(inputText) {
+        document.dispatchEvent(new CustomEvent('toolbox:todo-input', {
+            detail: {
+                text: inputText || ''
+            }
+        }));
     }
 
     function escapeHTML(str) {

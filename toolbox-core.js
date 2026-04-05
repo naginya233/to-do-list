@@ -97,4 +97,71 @@ document.addEventListener('DOMContentLoaded', () => {
         loadScript(ToolboxConfig[0].id, ToolboxConfig[0].scriptToLoad);
         loadedScripts.add(ToolboxConfig[0].id);
     }
+
+    // 5. Comfort Easter Egg for sensitive Todo inputs
+    setupComfortMonitor();
+
+    function setupComfortMonitor() {
+        const triggerKeywords = ['信心', '难', '失败'];
+        let lastTriggerAt = 0;
+
+        document.addEventListener('toolbox:todo-input', (event) => {
+            const text = event?.detail?.text || '';
+            maybeTriggerComfort(text);
+        });
+
+        document.addEventListener('input', (event) => {
+            const target = event.target;
+            if (!(target instanceof HTMLInputElement)) return;
+            if (target.id !== 'todo-input' && !target.classList.contains('edit-input')) return;
+            maybeTriggerComfort(target.value || '');
+        });
+
+        function maybeTriggerComfort(text) {
+            const raw = String(text || '').trim();
+            if (!raw) return;
+
+            const matched = triggerKeywords.some(keyword => raw.includes(keyword));
+            if (!matched) return;
+
+            const now = Date.now();
+            if (now - lastTriggerAt < 1800) return;
+            lastTriggerAt = now;
+
+            console.log("%c 凪君提示：检测到学妹心情不佳，正在启动最高等级安抚程序...", "color: #ff7f50; font-weight: bold;");
+            spawnComfortParticles();
+        }
+
+        function spawnComfortParticles() {
+            const layer = ensureParticleLayer();
+            const total = 16;
+
+            for (let i = 0; i < total; i++) {
+                const particle = document.createElement('span');
+                const useAg = Math.random() > 0.5;
+
+                particle.className = 'comfort-particle';
+                particle.textContent = useAg ? 'Ag' : '✦';
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.animationDuration = `${3 + Math.random() * 1.8}s`;
+                particle.style.animationDelay = `${Math.random() * 0.5}s`;
+                particle.style.fontSize = `${0.75 + Math.random() * 0.55}rem`;
+                particle.style.opacity = `${0.5 + Math.random() * 0.45}`;
+
+                layer.appendChild(particle);
+                setTimeout(() => particle.remove(), 5200);
+            }
+        }
+
+        function ensureParticleLayer() {
+            let layer = document.getElementById('comfort-particle-layer');
+            if (!layer) {
+                layer = document.createElement('div');
+                layer.id = 'comfort-particle-layer';
+                layer.className = 'comfort-particle-layer';
+                document.body.appendChild(layer);
+            }
+            return layer;
+        }
+    }
 });

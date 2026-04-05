@@ -10,17 +10,17 @@
 const ToolboxConfig = [
     {
         id: 'todo',
-        name: 'To-Do List',
+        name: '小确幸收集器',
         icon: 'fas fa-list-check',
         containerClass: 'tool-view',
         htmlGenerator: () => `
             <div class="view-header">
-                <h1>To-Do List</h1>
-                <p>Stay organized, stay productive.</p>
+                <h1>小确幸收集器</h1>
+                <p>把疲惫拆成一件件可完成的小事。</p>
             </div>
             
             <form id="todo-form">
-                <input type="text" id="todo-input" placeholder="What needs to be done?" autocomplete="off">
+                <input type="text" id="todo-input" placeholder="把烦恼写下来，慢慢拆解它" autocomplete="off">
                 <button type="submit" id="add-btn" aria-label="Add task"><i class="fas fa-plus"></i></button>
             </form>
 
@@ -214,22 +214,24 @@ const ToolboxConfig = [
     },
     {
         id: 'decision',
-        name: 'Random Picker',
+        name: '逃避虽可耻但有用',
         icon: 'fas fa-dice',
         containerClass: 'tool-view',
         htmlGenerator: () => `
             <div class="view-header">
-                <h1>Random Picker</h1>
-                <p>Can't decide? Let the wheels choose for you.</p>
+                <h1>逃避虽可耻但有用</h1>
+                <p>今晚不卷，交给转盘来偏袒你。</p>
             </div>
             <div class="decision-container">
-                <textarea id="decision-options" placeholder="Enter options here, separated by commas or new lines (e.g. Pizza, Sushi, Burgers)" spellcheck="false"></textarea>
+                <textarea id="decision-options" placeholder="输入你的选项（用逗号或换行分隔）" spellcheck="false">立刻去睡觉，梦里没有函数。
+听一首 n-buna 的歌，循环三遍。
+找凪学长吐苦水，直到心情变好。</textarea>
                 
                 <div class="decision-result-box">
-                    <span id="decision-result">Ready to decide?</span>
+                    <span id="decision-result">今晚让谁来照顾你的心情？</span>
                 </div>
 
-                <button id="decision-btn" class="decision-btn"><i class="fas fa-dice"></i> Pick Randomly!</button>
+                <button id="decision-btn" class="decision-btn"><i class="fas fa-dice"></i> 开始决策</button>
             </div>
         `,
         scriptToLoad: 'tools/decision.js'

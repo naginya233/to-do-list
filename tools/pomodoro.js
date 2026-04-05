@@ -15,6 +15,7 @@
     const timerResetBtn = document.getElementById('timer-reset-btn');
     const timerTabs = document.querySelectorAll('.timer-tab');
     const timerCircle = document.querySelector('.timer-progress');
+    const timerDisplayContainer = document.querySelector('.timer-display-container');
 
     if (!timerTimeEl) return;
 
@@ -66,6 +67,7 @@
         isTimerRunning = true;
         formatMainBtn('pause');
         timerResetBtn.disabled = false;
+        timerDisplayContainer?.classList.add('breathing');
 
         timerInterval = setInterval(() => {
             timerTime--;
@@ -81,7 +83,7 @@
                 } else {
                     switchMode('focus');
                 }
-                alert('Time is up!');
+                triggerCompletionPulse();
             }
         }, 1000);
     }
@@ -90,6 +92,7 @@
         isTimerRunning = false;
         clearInterval(timerInterval);
         formatMainBtn('start');
+        timerDisplayContainer?.classList.remove('breathing');
     }
 
     function resetTimer() {
@@ -97,6 +100,16 @@
         timerTime = pomodoroModes[currentMode];
         updateTimerDisplay();
         timerResetBtn.disabled = true;
+        timerDisplayContainer?.classList.remove('completion-pulse');
+    }
+
+    function triggerCompletionPulse() {
+        if (!timerDisplayContainer) return;
+        timerDisplayContainer.classList.remove('completion-pulse');
+        // Force reflow to restart the pulse animation.
+        void timerDisplayContainer.offsetWidth;
+        timerDisplayContainer.classList.add('completion-pulse');
+        setTimeout(() => timerDisplayContainer.classList.remove('completion-pulse'), 1700);
     }
 
     timerMainBtn.addEventListener('click', () => {

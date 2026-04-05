@@ -1,37 +1,41 @@
-@import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@400;500;600;700&display=swap');
 
 :root {
-    --bg-color: #f5f5f7;
-    --card-bg: rgba(255, 255, 255, 0.75);
-    --text-main: #1d1d1f;
-    --text-muted: #86868b;
-    --primary: #007aff;
-    --primary-hover: #0066cc;
+    --bg-color: #1a1c2c;
+    --card-bg: rgba(34, 40, 64, 0.62);
+    --text-main: #e8edf7;
+    --text-muted: #9faacc;
+    --primary: #6ea8ff;
+    --primary-hover: #8fbcff;
     --danger: #ff3b30;
     --danger-hover: #d70015;
-    --border: rgba(0, 0, 0, 0.1);
-    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.08);
+    --border: rgba(158, 179, 216, 0.2);
+    --shadow: 0 18px 50px -20px rgba(2, 7, 25, 0.75);
     --radius: 18px;
-    --font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    --input-bg: rgba(255, 255, 255, 0.9);
-    --input-focus: #ffffff;
-    --item-bg: rgba(255, 255, 255, 0.6);
-    --item-hover: rgba(255, 255, 255, 0.9);
+    --font-family: "Sora", "Segoe UI", sans-serif;
+    --input-bg: rgba(21, 28, 46, 0.75);
+    --input-focus: rgba(29, 38, 61, 0.9);
+    --item-bg: rgba(25, 34, 56, 0.7);
+    --item-hover: rgba(33, 44, 73, 0.86);
+    --surface: rgba(25, 34, 56, 0.55);
+    --success: #58c7ae;
 }
 
 [data-theme="dark"] {
-    --bg-color: #000000;
-    --card-bg: rgba(28, 28, 30, 0.75);
-    --text-main: #f5f5f7;
-    --text-muted: #98989d;
-    --primary: #0a84ff;
-    --primary-hover: #409cff;
-    --border: rgba(255, 255, 255, 0.15);
-    --shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.3);
-    --input-bg: rgba(44, 44, 46, 0.8);
-    --input-focus: #3a3a3c;
-    --item-bg: rgba(44, 44, 46, 0.5);
-    --item-hover: rgba(44, 44, 46, 0.9);
+    --bg-color: #1d2a29;
+    --card-bg: rgba(27, 49, 44, 0.6);
+    --text-main: #e9f6f0;
+    --text-muted: #9fc3b7;
+    --primary: #7bd9b4;
+    --primary-hover: #95e8c7;
+    --border: rgba(150, 205, 182, 0.22);
+    --shadow: 0 18px 45px -18px rgba(5, 20, 15, 0.72);
+    --input-bg: rgba(20, 40, 35, 0.78);
+    --input-focus: rgba(31, 56, 49, 0.9);
+    --item-bg: rgba(25, 48, 43, 0.66);
+    --item-hover: rgba(36, 63, 56, 0.82);
+    --surface: rgba(24, 46, 41, 0.52);
+    --success: #7bd9b4;
 }
 
 * {
@@ -45,8 +49,9 @@
 
 body {
     background-color: var(--bg-color);
-    background-image: radial-gradient(circle at 15% 50%, rgba(200, 200, 250, 0.3), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(200, 250, 250, 0.3), transparent 25%);
+    background-image: radial-gradient(circle at 15% 18%, rgba(151, 175, 255, 0.22), transparent 36%),
+        radial-gradient(circle at 82% 14%, rgba(112, 180, 163, 0.18), transparent 34%),
+        linear-gradient(160deg, rgba(14, 20, 38, 0.88) 0%, rgba(20, 30, 47, 0.72) 45%, rgba(19, 32, 42, 0.9) 100%);
     color: var(--text-main);
     display: flex;
     justify-content: center;
@@ -57,8 +62,8 @@ body {
 
 .app-container {
     background-color: var(--card-bg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     width: 100%;
     max-width: 1200px;
     height: 85vh;
@@ -74,7 +79,7 @@ body {
 /* Sidebar Layout */
 .sidebar {
     width: 260px;
-    background-color: rgba(0, 0, 0, 0.03);
+    background-color: rgba(10, 16, 31, 0.24);
     border-right: 1px solid var(--border);
     padding: 30px 20px;
     display: flex;
@@ -82,7 +87,7 @@ body {
 }
 
 [data-theme="dark"] .sidebar {
-    background-color: rgba(255, 255, 255, 0.02);
+    background-color: rgba(12, 29, 22, 0.28);
 }
 
 .sidebar-header {
@@ -538,6 +543,26 @@ body {
     justify-content: center;
 }
 
+.timer-display-container::after {
+    content: '';
+    position: absolute;
+    inset: 18px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(123, 217, 180, 0.35), transparent 68%);
+    opacity: 0;
+    transform: scale(0.85);
+    pointer-events: none;
+}
+
+.timer-display-container.breathing::after {
+    animation: calmBreath 2.8s ease-in-out infinite;
+}
+
+.timer-display-container.completion-pulse::after {
+    opacity: 0.9;
+    animation: completionGlow 1.6s ease-out;
+}
+
 .timer-svg {
     position: absolute;
     width: 100%;
@@ -569,6 +594,35 @@ body {
     color: var(--text-main);
     letter-spacing: -2px;
     z-index: 10;
+}
+
+@keyframes calmBreath {
+    0% {
+        opacity: 0.18;
+        transform: scale(0.82);
+    }
+
+    50% {
+        opacity: 0.75;
+        transform: scale(1);
+    }
+
+    100% {
+        opacity: 0.2;
+        transform: scale(0.84);
+    }
+}
+
+@keyframes completionGlow {
+    0% {
+        opacity: 0.9;
+        transform: scale(0.86);
+    }
+
+    100% {
+        opacity: 0;
+        transform: scale(1.18);
+    }
 }
 
 .timer-controls {
@@ -1061,12 +1115,12 @@ body {
     width: 60px;
     height: 60px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #6366f1, #a855f7);
+    background: linear-gradient(135deg, #3e84d8, #4ebf9f);
     color: white;
     border: none;
     font-size: 1.5rem;
     cursor: pointer;
-    box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+    box-shadow: 0 4px 15px rgba(62, 132, 216, 0.45);
     z-index: 1000;
     display: flex;
     justify-content: center;
@@ -1076,7 +1130,43 @@ body {
 
 .ai-copilot-btn:hover {
     transform: scale(1.1);
-    box-shadow: 0 6px 20px rgba(99, 102, 241, 0.6);
+    box-shadow: 0 6px 20px rgba(78, 191, 159, 0.55);
+}
+
+.comfort-particle-layer {
+    position: fixed;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    z-index: 20;
+}
+
+.comfort-particle {
+    position: absolute;
+    bottom: -24px;
+    color: rgba(207, 237, 255, 0.88);
+    text-shadow: 0 0 12px rgba(160, 204, 255, 0.45);
+    animation-name: comfortFloat;
+    animation-timing-function: linear;
+    animation-fill-mode: forwards;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+}
+
+@keyframes comfortFloat {
+    0% {
+        transform: translateY(0) translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+
+    12% {
+        opacity: 0.95;
+    }
+
+    100% {
+        transform: translateY(-110vh) translateX(16px) rotate(10deg);
+        opacity: 0;
+    }
 }
 
 .ai-copilot-window {
@@ -1123,7 +1213,7 @@ body {
 }
 
 .ai-header h3 i {
-    color: #a855f7;
+    color: var(--primary);
 }
 
 .ai-header-controls {
