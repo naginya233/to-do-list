@@ -1,7 +1,9 @@
+require('dotenv').config();
+
 async function getModels() {
     const res = await fetch('https://integrate.api.nvidia.com/v1/models', {
         headers: {
-            'Authorization': 'Bearer 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'
+            'Authorization': `Bearer ${process.env.NVIDIA_API_KEY}`
         }
     });
     const data = await res.json();
