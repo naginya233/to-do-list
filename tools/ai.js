@@ -1,5 +1,9 @@
 // tools/ai.js
 (function initAITool() {
+    const sync = window.ToolboxSync || null;
+    const apiBase = typeof sync?.apiBase === 'string'
+        ? sync.apiBase
+        : (window.location.protocol === 'file:' ? 'http://localhost:3000' : '');
     const aiCopilotBtn = document.getElementById('ai-copilot-btn');
     const aiCopilotWindow = document.getElementById('ai-copilot-window');
     const aiCloseBtn = document.getElementById('ai-close-btn');
@@ -139,15 +143,26 @@ If the user is just chatting or asking a general question, answer naturally. Be 
             return "Failed to find theme toggle.";
         },
         add_todo: (args) => {
-            // We can interact with localStorage directly to inject the task since tools are loosely coupled
-            let tasks = JSON.parse(localStorage.getItem('tasks')) || [];
+            let tasks = sync
+                ? sync.readLocal('tasks', [])
+                : (JSON.parse(localStorage.getItem('tasks')) || []);
             tasks.push({
                 id: Date.now().toString(),
                 text: args.task,
                 completed: false,
                 createdAt: new Date().toISOString()
             });
-            localStorage.setItem('tasks', JSON.stringify(tasks));
+
+            if (sync) {
+                sync.save({
+                    toolKey: 'todo',
+                    storageKey: 'tasks',
+                    data: tasks,
+                    immediate: true
+                });
+            } else {
+                localStorage.setItem('tasks', JSON.stringify(tasks));
+            }
 
             // If the todo script is already loaded and active, we need to refresh it.
             // A simple hack is to re-render if the container is visible.
@@ -155,7 +170,7 @@ If the user is just chatting or asking a general question, answer naturally. Be 
                 window.renderTodoToolIfAvailable();
             } else {
                 // Trigger a custom event that the todo.js can listen for
-                document.dispatchEvent(new CustomEvent('todo-updated'));
+                document.dispatchEvent(new CustomEvent('todo-updated', { detail: { tasks } }));
             }
 
             return `Successfully added "${args.task}" to the To-Do list.`;
@@ -168,9 +183,11 @@ If the user is just chatting or asking a general question, answer naturally. Be 
 
             // We'll read the existing v2 notes array
             let notes = [];
-            const savedData = localStorage.getItem('quick-notes-v2');
+            const savedData = sync
+                ? sync.readLocal('quick-notes-v2', [])
+                : localStorage.getItem('quick-notes-v2');
             if (savedData) {
-                notes = JSON.parse(savedData);
+                notes = Array.isArray(savedData) ? savedData : JSON.parse(savedData);
             }
 
             if (notes.length === 0) {
@@ -194,7 +211,16 @@ If the user is just chatting or asking a general question, answer naturally. Be 
             }
 
             // Save back to JSON array
-            localStorage.setItem('quick-notes-v2', JSON.stringify(notes));
+            if (sync) {
+                sync.save({
+                    toolKey: 'notes',
+                    storageKey: 'quick-notes-v2',
+                    data: notes,
+                    immediate: true
+                });
+            } else {
+                localStorage.setItem('quick-notes-v2', JSON.stringify(notes));
+            }
 
             // If the user happens to casually be looking at the Notes view right now, 
             // trigger an input event to force the UI script to re-render or at least sync up visually
@@ -260,7 +286,7 @@ If the user is just chatting or asking a general question, answer naturally. Be 
         requestBody.tools = toolsDef;
         requestBody.tool_choice = "auto";
 
-        const response = await fetch('http://localhost:3000/api/chat', {
+        const response = await fetch(`${apiBase}/api/chat`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

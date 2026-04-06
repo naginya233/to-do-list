@@ -8,9 +8,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const sidebarNav = document.getElementById('sidebar-nav');
     const mainContent = document.getElementById('main-content');
     const themeToggle = document.getElementById('theme-toggle');
+    const sidebarHeader = document.querySelector('.sidebar-header');
+    const syncClient = window.ToolboxSync || null;
 
     let loadedScripts = new Set();
     let isDarkMode = localStorage.getItem('theme') === 'dark';
+
+    setupAuthControls();
 
     // 1. Theme Initialization
     initTheme();
@@ -211,5 +215,60 @@ document.addEventListener('DOMContentLoaded', () => {
             closeOverlay();
             switchTool('decision');
         });
+    }
+
+    function setupAuthControls() {
+        if (!syncClient || !sidebarHeader) return;
+
+        const authBtn = document.createElement('button');
+        authBtn.id = 'auth-btn';
+        authBtn.className = 'nav-btn';
+        authBtn.style.marginLeft = '8px';
+        authBtn.style.fontSize = '0.78rem';
+
+        const renderAuthButton = () => {
+            const user = syncClient.getCurrentUser?.();
+            if (user?.username) {
+                authBtn.innerHTML = `<i class="fas fa-user-shield"></i> ${user.username}`;
+                authBtn.title = 'Click to logout';
+            } else {
+                authBtn.innerHTML = '<i class="fas fa-right-to-bracket"></i> Login';
+                authBtn.title = 'Login to enable cloud sync';
+            }
+        };
+
+        authBtn.addEventListener('click', async () => {
+            const user = syncClient.getCurrentUser?.();
+            if (user?.username) {
+                if (!confirm(`Logout current user: ${user.username}?`)) return;
+                syncClient.clearAuthSession?.();
+                location.reload();
+                return;
+            }
+
+            const username = prompt('Username:');
+            if (!username) return;
+
+            const password = prompt('Password:');
+            if (!password) return;
+
+            try {
+                await syncClient.login(username.trim(), password);
+                await syncClient.loadCurrentUser();
+                location.reload();
+            } catch (error) {
+                const message = error?.body?.error || error?.message || 'Login failed.';
+                alert(`Login failed: ${message}`);
+            }
+        });
+
+        sidebarHeader.appendChild(authBtn);
+        renderAuthButton();
+
+        syncClient.loadCurrentUser()
+            .then(renderAuthButton)
+            .catch(() => {
+                renderAuthButton();
+            });
     }
 });

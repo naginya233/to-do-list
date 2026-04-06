@@ -1,5 +1,6 @@
 // tools/todo.js
 (function initTodoTool() {
+    const sync = window.ToolboxSync || null;
     const todoForm = document.getElementById('todo-form');
     const todoInput = document.getElementById('todo-input');
     const todoList = document.getElementById('todo-list');
@@ -36,12 +37,14 @@
         }
     ];
 
-    const storedTasks = JSON.parse(localStorage.getItem('tasks'));
+    const storedTasks = sync
+        ? sync.readLocal('tasks', null)
+        : JSON.parse(localStorage.getItem('tasks'));
     let tasks = Array.isArray(storedTasks) && storedTasks.length > 0 ? storedTasks : DEFAULT_TASKS;
     let currentFilter = 'all';
 
     if (!Array.isArray(storedTasks) || storedTasks.length === 0) {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+        saveTasks({ immediate: true });
     }
 
     renderTasks();
@@ -276,9 +279,60 @@
     };
 
     function saveAndRender() {
-        localStorage.setItem('tasks', JSON.stringify(tasks));
+        saveTasks();
         renderTasks();
     }
+
+    function saveTasks(options = {}) {
+        if (sync) {
+            sync.save({
+                toolKey: 'todo',
+                storageKey: 'tasks',
+                data: tasks,
+                debounceMs: 350,
+                immediate: options.immediate === true
+            });
+            return;
+        }
+
+        localStorage.setItem('tasks', JSON.stringify(tasks));
+    }
+
+    if (sync) {
+        sync.reconcile({
+            toolKey: 'todo',
+            storageKey: 'tasks',
+            defaultData: tasks,
+            onResolved: ({ data, changed }) => {
+                if (!Array.isArray(data)) return;
+                if (!changed && data.length === tasks.length) return;
+                tasks = data;
+                renderTasks();
+            }
+        });
+    }
+
+    document.addEventListener('todo-updated', (event) => {
+        const maybeTasks = event?.detail?.tasks;
+        if (Array.isArray(maybeTasks)) {
+            tasks = maybeTasks;
+            renderTasks();
+            return;
+        }
+
+        const latest = sync
+            ? sync.readLocal('tasks', tasks)
+            : JSON.parse(localStorage.getItem('tasks'));
+
+        if (Array.isArray(latest)) {
+            tasks = latest;
+            renderTasks();
+        }
+    });
+
+    window.renderTodoToolIfAvailable = () => {
+        renderTasks();
+    };
 
     function emitComfortSignal(inputText) {
         document.dispatchEvent(new CustomEvent('toolbox:todo-input', {

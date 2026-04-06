@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Toolbox Admin Console</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="admin.css">
+</head>
+
+<body>
+    <div class="admin-bg admin-bg-a"></div>
+    <div class="admin-bg admin-bg-b"></div>
+
+    <main class="admin-shell">
+        <header class="admin-header card">
+            <div>
+                <p class="kicker">Toolbox Secure Zone</p>
+                <h1>管理员控制台</h1>
+                <p class="subtitle">多用户、权限、锁、并发与同步总览</p>
+            </div>
+            <div class="header-actions">
+                <a class="link-btn" href="index.html"><i class="fas fa-arrow-left"></i> 返回工具箱</a>
+                <span id="session-label" class="status-pill idle">未登录</span>
+                <button id="logout-btn" class="ghost-btn" type="button" disabled><i class="fas fa-right-from-bracket"></i> 退出</button>
+            </div>
+        </header>
+
+        <section id="notice" class="notice hidden"></section>
+
+        <section id="login-card" class="card auth-card">
+            <h2><i class="fas fa-user-shield"></i> 管理员登录</h2>
+            <form id="login-form">
+                <label>
+                    用户名
+                    <input id="login-username" type="text" autocomplete="username" required>
+                </label>
+                <label>
+                    密码
+                    <input id="login-password" type="password" autocomplete="current-password" required>
+                </label>
+                <button id="login-submit" type="submit" class="primary-btn"><i class="fas fa-lock-open"></i> 登录管理后台</button>
+            </form>
+        </section>
+
+        <section id="dashboard" class="dashboard hidden">
+            <div class="stats-grid">
+                <article class="card stat-card">
+                    <p class="stat-label">用户总数</p>
+                    <p id="stat-users" class="stat-value">-</p>
+                </article>
+                <article class="card stat-card">
+                    <p class="stat-label">活跃用户</p>
+                    <p id="stat-active" class="stat-value">-</p>
+                </article>
+                <article class="card stat-card">
+                    <p class="stat-label">管理员数</p>
+                    <p id="stat-admins" class="stat-value">-</p>
+                </article>
+                <article class="card stat-card">
+                    <p class="stat-label">同步记录</p>
+                    <p id="stat-sync" class="stat-value">-</p>
+                </article>
+            </div>
+
+            <section class="card section-card">
+                <div class="section-head">
+                    <h2><i class="fas fa-user-plus"></i> 新建用户</h2>
+                </div>
+                <form id="create-user-form" class="create-user-grid">
+                    <label>
+                        用户名
+                        <input id="create-username" type="text" required>
+                    </label>
+                    <label>
+                        密码
+                        <input id="create-password" type="password" required>
+                    </label>
+                    <label>
+                        角色
+                        <select id="create-role">
+                            <option value="user">user</option>
+                            <option value="admin">admin</option>
+                        </select>
+                    </label>
+                    <label class="switch-row">
+                        <input id="create-active" type="checkbox" checked>
+                        <span>创建为启用状态</span>
+                    </label>
+                    <button id="create-user-submit" type="submit" class="primary-btn"><i class="fas fa-plus"></i> 创建用户</button>
+                </form>
+            </section>
+
+            <section class="card section-card">
+                <div class="section-head">
+                    <h2><i class="fas fa-users-cog"></i> 用户权限管理</h2>
+                    <button id="refresh-users" class="ghost-btn" type="button"><i class="fas fa-rotate"></i> 刷新</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户名</th>
+                                <th>角色</th>
+                                <th>状态</th>
+                                <th>同步记录</th>
+                                <th>最近登录</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-body"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <section class="card section-card">
+                <div class="section-head">
+                    <h2><i class="fas fa-database"></i> 同步记录概览</h2>
+                    <button id="refresh-sync" class="ghost-btn" type="button"><i class="fas fa-rotate"></i> 刷新</button>
+                </div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>用户</th>
+                                <th>工具</th>
+                                <th>版本</th>
+                                <th>更新时间</th>
+                            </tr>
+                        </thead>
+                        <tbody id="sync-body"></tbody>
+                    </table>
+                </div>
+            </section>
+        </section>
+    </main>
+
+    <script src="sync-client.js"></script>
+    <script src="admin.js"></script>
+</body>
+
+</html>

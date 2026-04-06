@@ -1,5 +1,6 @@
 // tools/jupyter.js
 (function initJupyterTool() {
+    const sync = window.ToolboxSync || null;
     const cellsContainer = document.getElementById('nb-cells-container');
     const addCodeBtn = document.getElementById('nb-add-code-btn');
     const clearAllBtn = document.getElementById('nb-clear-all-btn');
@@ -11,7 +12,9 @@
     let isPyodideLoading = false;
     
     // Notebook State
-    let cells = JSON.parse(localStorage.getItem('jupyter-cells')) || [];
+    let cells = sync
+        ? sync.readLocal('jupyter-cells', [])
+        : (JSON.parse(localStorage.getItem('jupyter-cells')) || []);
     
     // Output buffering for Pyodide
     let stdoutBuffer = [];
@@ -55,6 +58,16 @@
 
     // --- Cell Management ---
     function saveCells() {
+        if (sync) {
+            sync.save({
+                toolKey: 'jupyter',
+                storageKey: 'jupyter-cells',
+                data: cells,
+                debounceMs: 600
+            });
+            return;
+        }
+
         localStorage.setItem('jupyter-cells', JSON.stringify(cells));
     }
 
@@ -240,6 +253,19 @@
     });
 
     renderCells();
+
+    if (sync) {
+        sync.reconcile({
+            toolKey: 'jupyter',
+            storageKey: 'jupyter-cells',
+            defaultData: cells,
+            onResolved: ({ data, changed }) => {
+                if (!Array.isArray(data) || !changed) return;
+                cells = data;
+                renderCells();
+            }
+        });
+    }
     
     // Start loading Python in the background immediately
     initPyodide();

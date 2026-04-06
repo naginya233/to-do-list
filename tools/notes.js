@@ -1,5 +1,6 @@
 // tools/notes.js
 (function initNotesTool() {
+    const sync = window.ToolboxSync || null;
     const listEl = document.getElementById('notes-list');
     const titleInput = document.getElementById('quick-notes-title');
     const contentInput = document.getElementById('quick-notes-input');
@@ -10,11 +11,34 @@
     let notes = [];
     let activeNoteId = null;
 
+    function normalizeNotes(input) {
+        if (!Array.isArray(input)) return [];
+        return input.map((note) => ({
+            id: String(note.id || Date.now().toString()),
+            title: typeof note.title === 'string' ? note.title : 'Untitled Note',
+            content: typeof note.content === 'string' ? note.content : '',
+            updatedAt: Number(note.updatedAt) || Date.now()
+        })).sort((a, b) => b.updatedAt - a.updatedAt);
+    }
+
     // Phase 15 Migration: Load existing data
     function loadData() {
-        const v2Data = localStorage.getItem('quick-notes-v2');
+        const v2Data = sync
+            ? sync.readLocal('quick-notes-v2', null)
+            : localStorage.getItem('quick-notes-v2');
+
         if (v2Data) {
-            notes = JSON.parse(v2Data);
+            try {
+                if (Array.isArray(v2Data)) {
+                    notes = normalizeNotes(v2Data);
+                } else if (typeof v2Data === 'string') {
+                    notes = normalizeNotes(JSON.parse(v2Data));
+                } else {
+                    notes = [];
+                }
+            } catch {
+                notes = [];
+            }
         } else {
             // Check for v1 string data and migrate
             const v1Data = localStorage.getItem('quick-notes');
@@ -26,6 +50,14 @@
                     updatedAt: Date.now()
                 }];
                 localStorage.removeItem('quick-notes'); // Cleanup old datastore
+                if (sync) {
+                    sync.save({
+                        toolKey: 'notes',
+                        storageKey: 'quick-notes-v2',
+                        data: notes,
+                        immediate: true
+                    });
+                }
             } else {
                 notes = [];
             }
@@ -33,6 +65,16 @@
     }
 
     function saveData() {
+        if (sync) {
+            sync.save({
+                toolKey: 'notes',
+                storageKey: 'quick-notes-v2',
+                data: notes,
+                debounceMs: 700
+            });
+            return;
+        }
+
         localStorage.setItem('quick-notes-v2', JSON.stringify(notes));
     }
 
@@ -210,14 +252,31 @@
         updatePreview();
     });
 
-    // Initialization logic
-    loadData();
-    if (notes.length > 0 && !activeNoteId) {
-        activeNoteId = notes[0].id;
-    } else if (notes.length === 0) {
-        createNote(); // Auto-create first note if empty
-    } else {
-        render(); // Just render if everything is setup
+    async function initialize() {
+        loadData();
+
+        if (sync) {
+            const result = await sync.reconcile({
+                toolKey: 'notes',
+                storageKey: 'quick-notes-v2',
+                defaultData: notes,
+                onResolved: ({ mode }) => {
+                    if (mode === 'offline') {
+                        console.warn('[Notes] Running in local-only mode. Remote sync unavailable.');
+                    }
+                }
+            });
+            notes = normalizeNotes(result.data);
+        }
+
+        if (notes.length > 0 && !activeNoteId) {
+            activeNoteId = notes[0].id;
+            render();
+        } else if (notes.length === 0) {
+            createNote(); // Auto-create first note if empty
+        } else {
+            render();
+        }
     }
     
     // Default to split view if screen is wide enough, else edit
@@ -226,4 +285,6 @@
     } else {
         setViewMode('edit');
     }
+
+    initialize();
 })();
